@@ -2,10 +2,11 @@ package com.test.api_impostos;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
@@ -13,12 +14,14 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-    @SpringBootTest // O @SpringBootTest cria uma instância completa do Spring Boot, o que significa que tudo, incluindo os beans e o contexto da aplicação, é carregado.
+    @ExtendWith(MockitoExtension.class)
+ // O @SpringBootTest cria uma instância completa do Spring Boot, o que significa que tudo, incluindo os beans e o contexto da aplicação, é carregado.
     public class ImportoServiceTest {
+
         @Mock
         private ImpostoRepository impostoRepository; // Mockando o repositório
 
-        @Autowired
+        @InjectMocks
         private ImpostoService impostoService; // Serviço que quero testar
 
         private Imposto imposto;
@@ -48,6 +51,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
             double valorImposto = impostoService.calcularImposto(imposto.getId(), valorBase); // Chamando o serviço para calcular o imposto
 
             assertEquals(180.0, valorImposto);
+
+            Mockito.verify(impostoRepository, Mockito.times(1)).findById(imposto.getId());
         }
 
         @Test
@@ -67,7 +72,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
             impostoService.excluir(imposto.getId());
 
+            Mockito.verify(impostoRepository, Mockito.times(1)).findById(imposto.getId());
             Mockito.verify(impostoRepository, Mockito.times(1)).deleteById(imposto.getId());
+
         }
     }
 
